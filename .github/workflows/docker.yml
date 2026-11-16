@@ -3,24 +3,20 @@ name: Build Docker image
 on:
   push:
     branches: [main]
-  workflow_dispatch:   # bouton "Run workflow" pour relancer à la main
-
+  workflow_dispatch:   
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Récupérer le code du repo
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Build de l'image -> télécharge le dernier modèle depuis DagsHub
       - name: Build image
         env:
           DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
         run: docker build --secret id=dagshub_token,env=DAGSHUB_TOKEN -t digits-api .
 
-      # 3. Lancer le conteneur et tester /predict
       - name: Test /predict
         run: |
           docker run -d -p 8000:8000 --name api digits-api
